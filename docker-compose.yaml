@@ -10,6 +10,21 @@ services:
     networks:
       - jenkins_nw
 
+  jenkins-docker:
+    image: docker:dind
+    container_name: jenkins-docker
+    privileged: true
+    ports:
+      - "2376:2376"
+      - "3000:3000"
+    environment:
+      DOCKER_TLS_CERT: /certs
+    volumes:
+      - jenkins-docker-certs:/certs/client
+      - jenkins-data:/var/jenkins_home
+    networks:
+      - jenkins_nw
+
   jenkins:
     container_name: jenkins
     build:
@@ -17,18 +32,28 @@ services:
       dockerfile: Dockerfile-jenkins
     ports:
       - "10000:8080"
+      - "50000:50000"
     environment:
         FLUENTD_HOST: fluentd
         FLUENTD_PORT: 24224
         TENANT: "jenkins"
+        JAVA_OPTS: -Djenkins.install.runSetupWizard=false
+        JENKINS_URL: "http://jenkins:10000"
         ACCESS_KEY: ${ACCESS_KEY}
         SECRET_KEY: ${SECRET_KEY}
+        # DinD configuration
+        DOCKER_HOST: tcp://docker:2376
+        DOCKER_CERT_PATH: /certs/client
+        DOCKER_TLS_VERIFY: 1
     volumes:
-      - jenkins_home:/var/jenkins_home
+      - jenkins-data:/var/jenkins_home
+      - jenkins-docker-certs:/certs/client:ro
     secrets:
       - jenkins-admin-password
     networks:
       - jenkins_nw
+    depends_on:
+      - jenkins-docker
 
   es01:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.6.0
@@ -160,17 +185,21 @@ services:
       - jenkins
 
 volumes:
-  jenkins_home:
-    driver: local
   data01:
     driver: local
   minio-storage:
     driver: local
   mlflow-storage:
     driver: local
+  jenkins-docker-certs:
+    driver: local
+  jenkins-data:
+    driver: local
 
 networks:
   jenkins_nw:
+    driver: bridge
+  docker:
     driver: bridge
 
 secrets:
