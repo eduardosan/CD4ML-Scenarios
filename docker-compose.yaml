@@ -4,7 +4,7 @@ services:
     container_name: welcome_server
     image: httpd:2.4-alpine
     ports:
-      - "3000:80"
+      - "30000:80"
     volumes:
       - ./public-html:/usr/local/apache2/htdocs/
     networks:
@@ -111,9 +111,11 @@ services:
       - es01
 
   model:
+    image: thoughtworks/cd4ml
     build:
       context: .
-      dockerfile: Dockerfile-model
+      dockerfile: Dockerfile
+      target: model
     container_name: model
     ports:
       - "11000:5005"
@@ -150,10 +152,12 @@ services:
       - jenkins_nw
 
   mlflow:
+    image: thoughtworks/cd4ml
     container_name: mlflow
     build:
       context: .
-      dockerfile: Dockerfile-mlflow
+      dockerfile: Dockerfile
+      target: mlflow
     environment:
       MLFLOW_S3_ENDPOINT_URL: http://minio:9000
       AWS_ACCESS_KEY_ID: ${ACCESS_KEY}
