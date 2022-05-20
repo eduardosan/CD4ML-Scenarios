@@ -13,14 +13,14 @@ WORKDIR /usr/src/app/cd4ml/
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
-COPY cd4ml .
+COPY . .
 
 FROM base as model
-RUN pip install -r requirements.txt
 EXPOSE 5005
 CMD flask run --host=0.0.0.0 --port 5005
 
 FROM base as mlflow
+COPY requirements.mlflow.txt requirements.txt
 RUN pip install -r requirements.mlflow.txt
 EXPOSE 5000
 ENV MLFLOW_S3_ENDPOINT_URL ${MLFLOW_S3_ENDPOINT_URL}

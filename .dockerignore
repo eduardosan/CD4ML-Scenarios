@@ -8,3 +8,5 @@ instructions/**
 ./cov_html/**
 .cache/**
 .jupyter/**
+docs/**
+drive/**

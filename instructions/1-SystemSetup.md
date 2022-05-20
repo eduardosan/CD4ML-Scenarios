@@ -28,6 +28,10 @@ git clone https://github.com/<Your User Name>/CD4ML-Scenarios
 Create a file called `jenkins-admin-password.txt` in the `jenkins\` folder. On the first line of the file type in a secure password. Save and close the file
 
 ### Docker Settings Adjustments
+
+It is necessary to increase resources utilization to run the workshop total infrastructure
+
+#### Windows Docker Desktop
 Open Docker Desktop by clicking on the docker icon in your Mac or Windows taskbar and selecting Dashboard. Click the gear and select "Resources" and then "Advanced". Increase the RAM allocated to docker to 4 Gigabytes. Click "Apply and Restart".
 
 ![DockerSettings](./images/DockerSettings.png)
@@ -35,6 +39,14 @@ Open Docker Desktop by clicking on the docker icon in your Mac or Windows taskba
 If you are running the environment on a Windows 10 machine, make sure to switch Docker to Linux-containers instead of Windows Containers.
 You can do this by clicking on the Docker icon in your Windows taskbar.
 You also need to make sure that your PC can handle virtual environments. This can be switched on or off in your systems BIOS.
+
+#### Colima
+
+Start colima with more CPUs and memory:
+
+```
+colima start --cpu 4 --memory 20
+```
 
 ## Select your development environment
 In the next section you can choose from one of two different application development 

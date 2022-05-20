@@ -23,22 +23,32 @@ pipeline {
 
     }
     stages {
-        stage('Install dependencies') {
-            steps {
-                sh 'pip3 install -r requirements.txt'
-            }
-        }
         stage('Run tests') {
+            agent {
+                docker {
+                    image 'thoughtworks/cd4ml'
+                }
+            }
             steps {
-                sh './run_tests.sh'
+                sh 'py.test'
             }
         }
         stage('Run ML pipeline') {
+            agent {
+                docker {
+                    image 'thoughtworks/cd4ml'
+                }
+            }
             steps {
                 sh 'python3 run_python_script.py pipeline ${problem_name} ${ml_pipeline_params_name} ${feature_set_name} ${algorithm_name} ${algorithm_params_name}'
             }
        }
        stage('Production - Register Model and Acceptance Test') {
+            agent {
+                docker {
+                    image 'thoughtworks/cd4ml'
+                }
+            }
            when {
               allOf {
                     equals expected: 'default', actual: "${params.ml_pipeline_params_name}"
@@ -60,6 +70,11 @@ pipeline {
            }
        }
        stage('Experiment - Register Model and Acceptance Test') {
+            agent {
+                docker {
+                    image 'thoughtworks/cd4ml'
+                }
+            }
             when {
                anyOf {
                     not { equals expected: 'default', actual: "${params.ml_pipeline_params_name}" }
